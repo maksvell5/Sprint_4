@@ -1,4 +1,5 @@
 import pytest
+
 from main import BooksCollector
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
@@ -26,7 +27,7 @@ class TestBooksCollector:
     # напиши свои тесты ниже
     # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
   
-    #Проверка установки жанра книги
+    #Проверка установки жанра книги и получения жанра по названию книги
     @pytest.mark.parametrize(
             'book_name, ganre',
             [
@@ -34,7 +35,7 @@ class TestBooksCollector:
              ['Что делать, если ваш кот хочет вас убить','Комедии']
              ]
     )
-    def test_set_book_ganre(self,book_name, ganre):
+    def test_set_book_ganre_and_get_book_genre(self,book_name, ganre):
         collector=BooksCollector()
         collector.add_new_book(book_name)
         
@@ -42,21 +43,23 @@ class TestBooksCollector:
         collector.set_book_genre(book_name,ganre)
        
 
-        assert collector.books_genre[book_name]==ganre
+        assert collector.get_book_genre(book_name)==ganre
         
 
 
-    #Проверка получение жанра книги по названию
-    def test_get_book_ganre(self):
+    #Проверить что книге не добавляется жанр которого нету в списке
+    def test_not_add_book_genre(self):
         collector=BooksCollector()
         collector.add_new_book('Гордость и предубеждение и зомби')
-        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
+        collector.set_book_genre('Гордость и предубеждение и зомби','Фанфик')
 
-        collector.set_book_genre('Гордость и предубеждение и зомби','Ужасы')
-        collector.set_book_genre('Что делать, если ваш кот хочет вас убить','Комедии')
+        assert len(collector.get_books_with_specific_genre('Фанфик'))==0
+        assert collector.get_book_genre('Гордость и предубеждение и зомби')==''
+        
 
-        assert collector.get_book_genre('Гордость и предубеждение и зомби')=='Ужасы'
-        assert collector.get_book_genre('Что делать, если ваш кот хочет вас убить')=='Комедии'
+
+
+        
 
 
     #Проверка метода выводящего книги с определенным жанром 
@@ -107,7 +110,7 @@ class TestBooksCollector:
 
         collector.add_book_in_favorites('Гордость и предубеждение и зомби')
 
-        assert len(collector.favorites) == 1
+        assert len(collector.get_list_of_favorites_books()) == 1
 
 
     #Проверка удалении книги из избраного
@@ -122,7 +125,7 @@ class TestBooksCollector:
         collector.add_book_in_favorites('Гордость и предубеждение и зомби')
         collector.delete_book_from_favorites('Гордость и предубеждение и зомби')
 
-        assert collector.favorites == []
+        assert collector.get_list_of_favorites_books() == []
 
     
     #Проверка получения списка избранных книг
@@ -138,7 +141,7 @@ class TestBooksCollector:
         collector.add_book_in_favorites('Что делать, если ваш кот хочет вас убить')
 
         assert len(collector.get_list_of_favorites_books()) == 2
-        assert collector.favorites == ['Гордость и предубеждение и зомби', 'Что делать, если ваш кот хочет вас убить']
+        assert collector.get_list_of_favorites_books() == ['Гордость и предубеждение и зомби', 'Что делать, если ваш кот хочет вас убить']
 
 
     #Проверить что книги с возрастным рейтингом не попадают в список для детей
